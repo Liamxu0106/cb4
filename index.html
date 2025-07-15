@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Climate AI Chatbot</title>
+    <style>
+        body { font-family: Arial; background: #f5f7fa; padding: 20px; }
+        #chatbox { border:1px solid #ccc; border-radius: 10px; background:#fff; height: 450px; overflow:auto; padding: 15px; }
+        input, button { font-size: 16px; }
+        .message { margin: 10px 0; padding: 10px; border-radius: 10px; }
+        .user { background: #007bff; color: white; text-align: right; }
+        .ai { background: #e0f7e9; color: #333; text-align: left; }
+    </style>
+</head>
+<body>
+
+<h3>Climate Dialogue Chatbot</h3>
+<div id="chatbox"></div>
+
+<input type="text" id="userInput" placeholder="Type your question..." style="width:75%;">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+    const chatbox = document.getElementById('chatbox');
+
+    function sendMessage() {
+        const userText = document.getElementById('userInput').value.trim();
+        if (!userText) return;
+
+        chatbox.innerHTML += `<div class="message user">${userText}</div>`;
+        document.getElementById('userInput').value = "";
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        fetch('https://cb3-ice8.onrender.com/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userText })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Server error");
+            return response.json();
+        })
+        .then(data => {
+            chatbox.innerHTML += `<div class="message ai">${data.reply}</div>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+        })
+        .catch(error => {
+            chatbox.innerHTML += `<div class="message ai" style="background:#ffcccc;">Error: ${error.message}</div>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+        });
+    }
+</script>
+
+</body>
+</html>
